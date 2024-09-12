@@ -1,7 +1,11 @@
 let bass, drums, basePerc, shaker, guitarMain, guitarIntro, guitarHarmony
 let cx, cy
+let drumTime = 0,
+   bassTime = 0
 // Constante para que el loop tenga sentido. Por alguna razón se exportaron más largos de lo que son
 const LOOP_DURATION = 4.17391304347826
+const PASS_RANGE = 0.25
+let score = 0
 
 function preload() {
    soundFormats("mp3", "ogg")
@@ -19,15 +23,20 @@ const soundsArePlaying = () => bass.isPlaying() || drums.isPlaying() || basePerc
 function setup() {
    const cnv = createCanvas(600, 600)
    cnv.mousePressed(playAll)
-   background(220)
    cx = width / 2
    cy = height / 2
-   textSize(20)
-   text("Click on the canvas to start", cx - 150, cy)
-   text("Press spacebar to play/stop bass", cx - 150, cy + 40)
-   text("Press P to play/pause all sounds", cx - 150, cy + 80)
-   text("Press G to play a random guitar part on next loop", cx - 150, cy + 120)
    setPlayMode()
+}
+
+function draw() {
+   background(220)
+   drumTime = drums.currentTime()
+   bassTime = bass.currentTime()
+   text("Score: " + score, cx - 150, cy - 80)
+   textSize(20)
+   text("Haz click en el canvas para comenzar", cx - 150, cy)
+   text('Pulsa "Espacio" para detener y reaundar el bajo', cx - 150, cy + 40)
+   // text("Presiona P para play/pausa de todos los sonidos", cx - 150, cy + 80)
 }
 
 function keyPressed() {
@@ -36,6 +45,15 @@ function keyPressed() {
          bass.stop()
       } else {
          bass.loop(undefined, undefined, undefined, undefined, LOOP_DURATION)
+         const timeDiff = abs(bassTime - drumTime)
+         console.log(timeDiff)
+         if (
+            timeDiff <= PASS_RANGE ||
+            timeDiff >= LOOP_DURATION - PASS_RANGE ||
+            (timeDiff <= LOOP_DURATION / 2 + PASS_RANGE && timeDiff >= LOOP_DURATION / 2 - PASS_RANGE)
+         ) {
+            score++
+         }
       }
    }
    if (key === "p" || key === "P") {
@@ -44,11 +62,6 @@ function keyPressed() {
       } else {
          playAll()
       }
-   }
-
-   if (key === "g" || key === "G") {
-      const randomGuitar = random([guitarMain, guitarIntro, guitarHarmony])
-      randomGuitar.play(LOOP_DURATION - drums.currentTime())
    }
 }
 
