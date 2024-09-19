@@ -4,7 +4,7 @@ let drumTime = 0,
    bassTime = 0
 // Constante para que el loop tenga sentido. Por alguna razón se exportaron más largos de lo que son
 const LOOP_DURATION = 4.17391304347826
-const PASS_RANGE = 0.6
+const PASS_RANGE = 0.5
 const SCORE_DURATION = 2000
 let score = 0
 let showBassText = false,
